@@ -216,6 +216,58 @@ class _SquirrelShoppingState extends State<SquirrelShopping> {
     }
   }
 
+  //makes dictionary and loops through lists of squirrels up for auction
+  //adds name as key and price as value
+  //loops through dictionary to find min,
+  //returns the key value of that entry as a string
+  String getCheapestSquirrel() {
+    Map<String, double> dic = {};
+    for (int i = 0; i < items.length; i++) {
+      dic[items[i].name] = items[i].price;
+    }
+    //print(dic);
+    String cheapest = '';
+    double min = double.maxFinite;
+    for (int i = 0; i < dic.length; i++) {
+      if (dic.values.elementAt(i) < min) {
+        cheapest = dic.entries.elementAt(i).key as String;
+        min = dic.values.elementAt(i);
+      }
+    }
+    return cheapest;
+  }
+
+  //build an alert dialouge with more squirrel info
+  //the alert dialouge tells which squirrel is cheapest
+  //accessed through hamburger at top right of screen
+  Future<void> _leastSquirrel(BuildContext context) async {
+    print("Loading Least Expensive Squirrel");
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Cheapest Squirrel'),
+            content: SizedBox(
+              width: 100,
+              height: 60,
+              child: Text(getCheapestSquirrel()),
+            ),
+            actions: <Widget>[
+              ElevatedButton(
+                key: const Key("OKButton"),
+                style: yesStyle,
+                child: const Text('Leave'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -231,6 +283,12 @@ class _SquirrelShoppingState extends State<SquirrelShopping> {
               onListChanged: _handleSquirrelSelling,
               onPriceIncrease: _handleAuction);
         }).toList(),
+      ),
+      endDrawer: ElevatedButton(
+        onPressed: () {
+          _leastSquirrel(context);
+        },
+        child: Text('Find Cheapest Squirrel'),
       ),
       floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
